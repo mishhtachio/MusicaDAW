@@ -95,30 +95,49 @@ export function useTileDetection({
       }
 
       try {
-        // Draw frame matching the video container's aspect ratio and CSS object-fit: cover
+        // Draw frame matching the video container's exact aspect ratio and CSS object-fit: cover
         if (feed instanceof HTMLVideoElement && feed.videoWidth > 0 && feed.videoHeight > 0) {
           const vw = feed.videoWidth;
           const vh = feed.videoHeight;
-          const cw = canvas.width;
-          const ch = canvas.height;
-          const videoRatio = vw / vh;
-          const canvasRatio = cw / ch;
+          const container = feed.parentElement;
+          const containerW = container ? container.clientWidth : 480;
+          const containerH = container ? container.clientHeight : 360;
+          const containerRatio = (containerW && containerH) ? containerW / containerH : 4 / 3;
 
+          // Dynamically size processing canvas to match container's exact aspect ratio
+          // while maintaining real-time mobile performance (~170k pixels)
+          const baseDim = 480;
+          let targetW: number;
+          let targetH: number;
+          if (containerRatio >= 1) {
+            targetW = baseDim;
+            targetH = Math.max(180, Math.round(baseDim / containerRatio));
+          } else {
+            targetH = baseDim;
+            targetW = Math.max(180, Math.round(baseDim * containerRatio));
+          }
+
+          if (canvas.width !== targetW || canvas.height !== targetH) {
+            canvas.width = targetW;
+            canvas.height = targetH;
+          }
+
+          const videoRatio = vw / vh;
           let sx = 0;
           let sy = 0;
           let sw = vw;
           let sh = vh;
 
-          // Object-fit: cover emulation
-          if (videoRatio > canvasRatio) {
-            sw = Math.round(vh * canvasRatio);
+          // Object-fit: cover emulation matching the screen container exactly
+          if (videoRatio > containerRatio) {
+            sw = Math.round(vh * containerRatio);
             sx = Math.round((vw - sw) / 2);
           } else {
-            sh = Math.round(vw / canvasRatio);
+            sh = Math.round(vw / containerRatio);
             sy = Math.round((vh - sh) / 2);
           }
 
-          ctx.drawImage(feed, sx, sy, sw, sh, 0, 0, cw, ch);
+          ctx.drawImage(feed, sx, sy, sw, sh, 0, 0, targetW, targetH);
         } else {
           ctx.drawImage(feed, 0, 0, canvas.width, canvas.height);
         }

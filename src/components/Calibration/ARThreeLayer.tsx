@@ -101,10 +101,12 @@ export const ARThreeLayer: React.FC<ARThreeLayerProps> = ({
             const center = boardToImage((u0 + u1) / 2, (v0 + v1) / 2, H);
             const rightEdge = boardToImage(u1, (v0 + v1) / 2, H);
 
-            // Convert to canvas pixel coordinates
+            // Convert to canvas pixel coordinates using Euclidean distance (orientation-invariant)
             const screenX = center.x * cw;
             const screenY = center.y * ch;
-            const radiusPx = Math.abs(rightEdge.x * cw - screenX) * 0.75;
+            const dx = (rightEdge.x - center.x) * cw;
+            const dy = (rightEdge.y - center.y) * ch;
+            const radiusPx = Math.sqrt(dx * dx + dy * dy) * 0.75;
 
             activePositions.set(cellKey, {
               x: screenX,

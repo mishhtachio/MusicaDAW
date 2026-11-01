@@ -280,8 +280,9 @@ export const CalibrationOverlay: React.FC<CalibrationOverlayProps> = ({
 
           const center = boardToImage((u0 + u1) / 2, (v0 + v1) / 2, H);
           const rightEdge = boardToImage(u1, (v0 + v1) / 2, H);
-          const radiusX = Math.abs(toSvgX(rightEdge.x) - toSvgX(center.x));
-          const radius = Math.max(14, radiusX * 0.72);
+          const dxSvg = toSvgX(rightEdge.x) - toSvgX(center.x);
+          const dySvg = toSvgY(rightEdge.y) - toSvgY(center.y);
+          const radius = Math.max(14, Math.sqrt(dxSvg * dxSvg + dySvg * dySvg) * 0.72);
 
           const isSounding = playbackStatus === 'playing' && currentStep === c;
           const isDrum = instrument === 'drums';
