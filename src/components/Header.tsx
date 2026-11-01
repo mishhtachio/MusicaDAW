@@ -11,7 +11,7 @@ export const Header: React.FC<HeaderProps> = ({ currentMode, onModeChange }) => 
     <header className="app-header">
       <div className="header-title-row">
         <div className="brand-badge">🎵 Tangible Music Roll</div>
-        <h1 className="header-title">DaddyDAW</h1>
+        <h1 className="header-title">MusicaDAW</h1>
       </div>
       <p className="header-tagline">
         Compose music with tangible tiles on your handmade board or on screen.

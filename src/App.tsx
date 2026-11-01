@@ -24,18 +24,19 @@ import { FreejamFullscreenAR } from './components/freejam/FreejamFullscreenAR';
 import './App.css';
 import './styles/freejam.css';
 
-const SAVED_TRACKS_STORAGE_KEY = 'daddydaw_saved_tracks';
+const SAVED_TRACKS_STORAGE_KEY = 'musicadaw_saved_tracks';
+const LEGACY_STORAGE_KEY = 'daddydaw_saved_tracks';
 
 function loadSavedTracksFromStorage(): SavedTrack[] {
   try {
-    const raw = localStorage.getItem(SAVED_TRACKS_STORAGE_KEY);
+    const raw = localStorage.getItem(SAVED_TRACKS_STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed)) {
       return parsed;
     }
   } catch (err) {
-    console.warn('[DaddyDAW] Error loading saved tracks from localStorage:', err);
+    console.warn('[MusicaDAW] Error loading saved tracks from localStorage:', err);
   }
   return [];
 }
@@ -68,7 +69,7 @@ export function App() {
     try {
       localStorage.setItem(SAVED_TRACKS_STORAGE_KEY, JSON.stringify(savedTracks));
     } catch (err) {
-      console.warn('[DaddyDAW] Error saving tracks to localStorage:', err);
+      console.warn('[MusicaDAW] Error saving tracks to localStorage:', err);
     }
   }, [savedTracks]);
 

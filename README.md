@@ -1,6 +1,6 @@
-# DaddyDAW - Tangible Music Learning for Children
+# MusicaDAW - Tangible Music Learning for Children
 
-DaddyDAW is a browser-based tangible music-learning application designed for children. Children compose music by placing physical rectangular tiles on a handmade piano-roll board that a stationary smartphone camera views and augments with synchronized audio playback and visual feedback.
+MusicaDAW is a browser-based tangible music-learning application designed for children. Children compose music by placing physical tiles on a handmade music-roll board that a smartphone camera views and augments with synchronized audio playback, Three.js 3D character AR, and visual feedback.
 
 The application contains two integrated modes:
 1. **🎹 Manual Sequencer (Stage 1)**: Interactive on-screen piano roll with Web Audio playback and configurable grid dimensions.
