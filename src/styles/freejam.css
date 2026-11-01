@@ -1,0 +1,1043 @@
+/* ==========================================================================
+   FREEJAM THEME & DESIGN SYSTEM (Matching Figma Spec)
+   Playful, Tactile, Cream & Golden Claymorphic UI
+   ========================================================================== */
+
+:root {
+  --fj-bg: #fff8dc;
+  --fj-bg-gradient-top: #fffbf0;
+  --fj-bg-gradient-bottom: #fff1cc;
+  --fj-card-bg: #fde68a;
+  --fj-card-border: #fcd34d;
+  --fj-card-shadow: rgba(217, 119, 6, 0.16);
+
+  --fj-yellow-btn-start: #fef08a;
+  --fj-yellow-btn-end: #facc15;
+  --fj-yellow-btn-border: #f59e0b;
+  --fj-yellow-btn-shadow: #d97706;
+
+  --fj-blue-btn-start: #60a5fa;
+  --fj-blue-btn-end: #3b82f6;
+  --fj-blue-btn-border: #2563eb;
+  --fj-blue-btn-shadow: #1d4ed8;
+
+  --fj-teal-save-start: #34d399;
+  --fj-teal-save-end: #10b981;
+  --fj-teal-save-border: #047857;
+  --fj-teal-save-shadow: #065f46;
+  --fj-teal-save-text: #064e3b;
+
+  --fj-text-primary: #18181b;
+  --fj-text-secondary: #52525b;
+}
+
+/* Outer layout matching smartphone viewport */
+.freejam-app-container {
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(180deg, var(--fj-bg-gradient-top) 0%, var(--fj-bg-gradient-bottom) 100%);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 12px 16px 24px;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.freejam-phone-shell {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 auto;
+}
+
+/* ==========================================================================
+   1. TOP NAVIGATION HEADER
+   ========================================================================== */
+.freejam-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px 0;
+}
+
+.freejam-title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--fj-text-primary);
+  letter-spacing: -0.3px;
+  text-align: center;
+}
+
+.freejam-circle-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  position: relative;
+  outline: none;
+  padding: 0;
+}
+
+.freejam-circle-btn:active {
+  transform: translateY(3px);
+}
+
+.freejam-circle-btn.btn-back {
+  background: linear-gradient(180deg, var(--fj-yellow-btn-start) 0%, var(--fj-yellow-btn-end) 100%);
+  border: 3.5px solid var(--fj-yellow-btn-border);
+  box-shadow: 0 4px 0 var(--fj-yellow-btn-shadow), 0 6px 12px rgba(217, 119, 6, 0.22);
+  color: #ffffff;
+}
+
+.freejam-circle-btn.btn-back:active {
+  box-shadow: 0 1px 0 var(--fj-yellow-btn-shadow);
+}
+
+.freejam-circle-btn.btn-settings {
+  background: linear-gradient(180deg, var(--fj-blue-btn-start) 0%, var(--fj-blue-btn-end) 100%);
+  border: 3.5px solid var(--fj-blue-btn-border);
+  box-shadow: 0 4px 0 var(--fj-blue-btn-shadow), 0 6px 12px rgba(37, 99, 235, 0.25);
+  color: #ffffff;
+}
+
+.freejam-circle-btn.btn-settings:active {
+  box-shadow: 0 1px 0 var(--fj-blue-btn-shadow);
+}
+
+.freejam-icon {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+/* ==========================================================================
+   2. INSTRUMENT / SOUND SELECTOR BAR
+   ========================================================================== */
+.freejam-instrument-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 4px 8px;
+  gap: 12px;
+}
+
+.freejam-music-badge {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  outline: none;
+  padding: 0;
+}
+
+.freejam-music-badge:active {
+  transform: scale(0.92);
+}
+
+.freejam-music-badge .music-note-icon {
+  font-size: 1.55rem;
+  color: #ffffff;
+  font-weight: 900;
+  z-index: 2;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+}
+
+.freejam-music-badge .badge-gloss {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 100%);
+  border-top-left-radius: 50px;
+  border-top-right-radius: 50px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Badge colors */
+.freejam-music-badge.badge-blue {
+  background: radial-gradient(circle at 35% 30%, #3b82f6 0%, #1d4ed8 100%);
+  border: 3.5px solid #1e40af;
+  box-shadow: 0 4px 0 #172554, 0 6px 12px rgba(29, 78, 216, 0.28);
+}
+
+.freejam-music-badge.badge-pink {
+  background: radial-gradient(circle at 35% 30%, #ec4899 0%, #be185d 100%);
+  border: 3.5px solid #9d174d;
+  box-shadow: 0 4px 0 #500724, 0 6px 12px rgba(190, 24, 93, 0.28);
+}
+
+.freejam-music-badge.badge-teal {
+  background: radial-gradient(circle at 35% 30%, #0d9488 0%, #0f766e 100%);
+  border: 3.5px solid #115e59;
+  box-shadow: 0 4px 0 #042f2e, 0 6px 12px rgba(15, 118, 110, 0.28);
+}
+
+.freejam-music-badge.badge-coral {
+  background: radial-gradient(circle at 35% 30%, #ef4444 0%, #b91c1c 100%);
+  border: 3.5px solid #991b1b;
+  box-shadow: 0 4px 0 #450a0a, 0 6px 12px rgba(185, 28, 28, 0.28);
+}
+
+/* Active glowing ring on selected instrument badge */
+.freejam-music-badge.active {
+  transform: translateY(-2px) scale(1.08);
+  box-shadow: 0 0 0 3px #ffffff, 0 0 0 6px var(--fj-yellow-btn-border), 0 8px 16px rgba(0, 0, 0, 0.25);
+}
+
+/* ==========================================================================
+   3. MAIN VIEWPORT CARD (Camera / Touch Sequencer Container)
+   ========================================================================== */
+.freejam-viewport-card {
+  width: 100%;
+  aspect-ratio: 4 / 4.4;
+  background-color: var(--fj-card-bg);
+  border-radius: 28px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 24px var(--fj-card-shadow), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+  border: 4px solid var(--fj-card-border);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Top-right corner scan / mode reticle button */
+.freejam-card-reticle-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(4px);
+  border-radius: 10px;
+  border: 2px solid #b45309;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #78350f;
+  cursor: pointer;
+  z-index: 20;
+  transition: transform 0.12s ease, background-color 0.12s ease;
+  padding: 0;
+}
+
+.freejam-card-reticle-btn:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: scale(1.05);
+}
+
+.freejam-card-reticle-btn:active {
+  transform: scale(0.95);
+}
+
+.reticle-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Inside container for camera or manual roll */
+.freejam-card-content {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Camera feed embedded inside card */
+.freejam-card-content .camera-feed-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.freejam-card-content .camera-feed-container video,
+.freejam-card-content .camera-feed-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  border-radius: 24px;
+}
+
+/* Live tile recognition pill badge inside card */
+.freejam-card-status-pill {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 15;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Manual Roll inside card */
+.freejam-card-content .piano-roll-container {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  border-radius: 24px;
+}
+
+/* ==========================================================================
+   4. TACTILE TRANSPORT CONTROLS (Overlay, Play, Loop)
+   ========================================================================== */
+.freejam-transport-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 24px;
+  padding: 4px 0;
+}
+
+.transport-button-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.freejam-round-btn {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: linear-gradient(180deg, var(--fj-yellow-btn-start) 0%, var(--fj-yellow-btn-end) 100%);
+  border: 3.5px solid var(--fj-yellow-btn-border);
+  box-shadow: 0 5px 0 var(--fj-yellow-btn-shadow), 0 8px 18px rgba(217, 119, 6, 0.25);
+  color: #78350f;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  outline: none;
+  position: relative;
+  padding: 0;
+}
+
+.freejam-round-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--fj-yellow-btn-shadow);
+}
+
+.freejam-round-btn.btn-overlay,
+.freejam-round-btn.btn-loop {
+  width: 68px;
+  height: 68px;
+}
+
+.freejam-round-btn.btn-overlay.active {
+  background: linear-gradient(180deg, #fef08a 0%, #eab308 100%);
+  border-color: #b45309;
+}
+
+/* Big Center Play / Pause Button */
+.freejam-round-btn.btn-main-play {
+  width: 88px;
+  height: 88px;
+  border: 4.5px solid var(--fj-yellow-btn-border);
+  box-shadow: 0 6px 0 var(--fj-yellow-btn-shadow), 0 10px 22px rgba(217, 119, 6, 0.32);
+}
+
+.freejam-round-btn.btn-main-play.playing {
+  background: linear-gradient(180deg, #fef08a 0%, #eab308 100%);
+  box-shadow: 0 6px 0 #b45309, 0 10px 24px rgba(180, 83, 9, 0.35);
+}
+
+.freejam-round-btn .transport-icon {
+  width: 32px;
+  height: 32px;
+  display: block;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
+}
+
+.freejam-round-btn.btn-main-play .transport-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.transport-label {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--fj-text-primary);
+  letter-spacing: -0.2px;
+}
+
+/* ==========================================================================
+   5. BOTTOM SAVE ACTION PILL
+   ========================================================================== */
+.freejam-save-container {
+  width: 100%;
+  padding-top: 4px;
+}
+
+.freejam-pill-save-btn {
+  width: 100%;
+  height: 56px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, var(--fj-teal-save-start) 0%, var(--fj-teal-save-end) 100%);
+  border: 3.5px solid var(--fj-teal-save-border);
+  box-shadow: 0 5px 0 var(--fj-teal-save-shadow), 0 8px 18px rgba(4, 120, 87, 0.28);
+  color: var(--fj-teal-save-text);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.2s ease;
+  outline: none;
+  padding: 0;
+}
+
+.freejam-pill-save-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 var(--fj-teal-save-shadow);
+}
+
+.freejam-pill-save-btn.saved-success {
+  background: linear-gradient(180deg, #6ee7b7 0%, #059669 100%);
+  color: #ffffff;
+}
+
+.save-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.save-check-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.save-empty-badge {
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0.75;
+}
+
+/* ==========================================================================
+   6. SETTINGS & MULTI-TRACK MODAL SHEET
+   ========================================================================== */
+.freejam-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeIn 0.18s ease-out;
+}
+
+.freejam-modal-sheet {
+  width: 100%;
+  max-width: 480px;
+  background: #ffffff;
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  padding: 16px 20px 32px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.25);
+  animation: slideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.modal-drag-handle {
+  width: 42px;
+  height: 5px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  margin: 0 auto 12px;
+}
+
+.modal-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.modal-close-btn {
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-sheet-body {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 8px;
+}
+
+.modal-section {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 14px 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.section-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.section-value-badge {
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+.section-badge-count {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.section-hint {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 0 0 10px;
+  line-height: 1.35;
+}
+
+/* Tempo slider controls */
+.modal-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tempo-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.freejam-range-slider {
+  flex: 1;
+  accent-color: #f59e0b;
+  height: 8px;
+  border-radius: 4px;
+}
+
+/* Saved tracks list in modal */
+.saved-tracks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-track-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.modal-track-card.active-layer {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.track-left-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.track-inst-tag {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.track-inst-tag.tag-piano {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.track-inst-tag.tag-drum {
+  background: #fce7f3;
+  color: #9d174d;
+}
+
+.track-name-text {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.track-notes-count {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.track-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.track-preview-btn,
+.track-layer-btn,
+.track-delete-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.track-preview-btn {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.track-layer-btn.layer-on {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.track-layer-btn.layer-off {
+  background: #e2e8f0;
+  color: #64748b;
+}
+
+.track-delete-btn {
+  background: transparent;
+  color: #ef4444;
+  padding: 6px;
+}
+
+.empty-tracks-placeholder {
+  padding: 16px;
+  text-align: center;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1.5px dashed #cbd5e1;
+  color: #64748b;
+  font-size: 0.88rem;
+}
+
+.modal-clear-board-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  background: #fee2e2;
+  border: 1.5px solid #fca5a5;
+  color: #b91c1c;
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.modal-clear-board-btn:hover {
+  background: #fecaca;
+}
+
+/* ==========================================================================
+   7. PIANO ROLL & TOUCH SEQUENCER CUSTOM STYLING INSIDE FREEJAM CARD
+   ========================================================================== */
+.freejam-card-content .piano-roll-container {
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.freejam-card-content .piano-roll-header {
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+}
+
+.freejam-card-content .pitch-header-spacer {
+  width: 54px;
+  flex-shrink: 0;
+}
+
+.freejam-card-content .step-indicators {
+  flex: 1;
+  display: grid;
+  gap: 6px;
+}
+
+.freejam-card-content .step-badge {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1.5px solid #d97706;
+  border-radius: 8px;
+  padding: 3px 0;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #78350f;
+  text-align: center;
+}
+
+.freejam-card-content .step-badge.active {
+  background: #f59e0b;
+  color: #ffffff;
+  border-color: #b45309;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+}
+
+.freejam-card-content .piano-roll-main {
+  flex: 1;
+  display: flex;
+  gap: 8px;
+  min-height: 0;
+}
+
+.freejam-card-content .pitch-labels-column {
+  width: 54px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.freejam-card-content .pitch-label-btn {
+  flex: 1;
+  background: #ffffff;
+  border: 2px solid #f59e0b;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #78350f;
+  box-shadow: 0 2px 0 #d97706;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.freejam-card-content .grid-board {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.45);
+  border-radius: 16px;
+  padding: 6px;
+  border: 2px solid rgba(245, 158, 11, 0.35);
+  display: grid;
+  gap: 6px;
+}
+
+.freejam-card-content .grid-row {
+  display: grid;
+  gap: 6px;
+}
+
+.freejam-card-content .grid-cell {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 2px solid #fef3c7;
+  box-shadow: 0 3px 0 #fde68a;
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.12s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.freejam-card-content .grid-cell:active {
+  transform: scale(0.92);
+}
+
+.freejam-card-content .grid-cell.active-piano {
+  background: #3b82f6 !important;
+  border-color: #1d4ed8 !important;
+  box-shadow: 0 3px 0 #1e40af, 0 4px 10px rgba(59, 130, 246, 0.4) !important;
+  color: #ffffff;
+}
+
+.freejam-card-content .grid-cell.active-drum {
+  background: #ec4899 !important;
+  border-color: #be185d !important;
+  box-shadow: 0 3px 0 #9d174d, 0 4px 10px rgba(236, 72, 153, 0.4) !important;
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   8. FULL SCREEN CAMERA FEED & AR MODE (Portrait & Landscape Responsive)
+   ========================================================================== */
+.freejam-fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  background: #000000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.fullscreen-camera-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.fullscreen-camera-wrapper .camera-feed-container {
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+.fullscreen-camera-wrapper video,
+.fullscreen-camera-wrapper canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* Floating Top HUD */
+.fullscreen-top-hud {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.fullscreen-hud-btn {
+  pointer-events: auto;
+  border: none;
+  border-radius: 24px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  transition: transform 0.12s ease, background 0.15s ease;
+  outline: none;
+}
+
+.fullscreen-hud-btn:active {
+  transform: scale(0.94);
+}
+
+.fullscreen-hud-btn.btn-exit {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+}
+
+.fullscreen-hud-btn.btn-exit:hover {
+  background: rgba(30, 41, 59, 0.95);
+}
+
+.hud-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.fullscreen-status-badge {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
+  color: #e2e8f0;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+}
+
+.badge-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulseGreen 1.6s infinite;
+}
+
+@keyframes pulseGreen {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* Floating Bottom HUD */
+.fullscreen-bottom-hud {
+  position: absolute;
+  bottom: 24px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.fullscreen-hud-btn.btn-toggle-ar {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+}
+
+.fullscreen-hud-btn.btn-toggle-ar.active {
+  background: linear-gradient(180deg, #fef08a 0%, #f59e0b 100%);
+  color: #78350f;
+  border-color: #b45309;
+}
+
+.fullscreen-hud-btn.btn-play-pause {
+  background: #3b82f6;
+  color: #ffffff;
+  border: 1.5px solid #2563eb;
+  padding: 10px 22px;
+  font-size: 1rem;
+}
+
+.fullscreen-hud-btn.btn-play-pause.playing {
+  background: #eab308;
+  color: #78350f;
+  border-color: #ca8a04;
+}
+
+.fullscreen-hud-btn.btn-quick-save {
+  background: #10b981;
+  color: #ffffff;
+  border: 1.5px solid #059669;
+}
+
+/* Fullscreen Landscape Optimization for Mobile */
+@media (orientation: landscape) {
+  .fullscreen-top-hud {
+    top: 10px;
+    left: 20px;
+    right: 20px;
+  }
+
+  .fullscreen-bottom-hud {
+    bottom: 12px;
+    gap: 16px;
+  }
+
+  .fullscreen-hud-btn {
+    padding: 6px 14px;
+    font-size: 0.85rem;
+  }
+}

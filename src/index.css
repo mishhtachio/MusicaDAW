@@ -1,0 +1,52 @@
+:root {
+  --color-canvas-bg: #f5f7fa;
+  --color-board-bg: #ffffff;
+  --color-grid-border: #dde3ea;
+  --color-grid-line: #edf2f7;
+  --color-text-primary: #1e293b;
+  --color-text-secondary: #64748b;
+  --color-brand: #0284c7;
+
+  /* Tangible tile palette (cyan fill with magenta border from reference image) */
+  --tile-bg: #29d8cd;
+  --tile-border: #d81b60;
+  --tile-shadow: rgba(216, 27, 96, 0.35);
+
+  /* Playhead */
+  --playhead-color: #ff9800;
+  --playhead-highlight: rgba(255, 152, 0, 0.12);
+
+  /* Fonts */
+  --font-family: 'Fredoka', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  background-color: var(--color-canvas-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-family);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
