@@ -86,6 +86,23 @@ export function createARSceneManager(
   let masterGLB: LoadedGLBCharacter | null = null;
   loadGLBCharacter().then((loaded) => {
     masterGLB = loaded;
+    if (loaded) {
+      // Upgrade any instances that were spawned before network loading completed
+      for (const inst of characters.values()) {
+        if (!inst.glbInstance) {
+          if (inst.rig) {
+            inst.subScene.remove(inst.rig.root);
+            inst.rig = undefined;
+          }
+          if (inst.platform) {
+            inst.subScene.remove(inst.platform);
+            inst.platform = undefined;
+          }
+          inst.glbInstance = instantiateGLBCharacter(loaded);
+          inst.subScene.add(inst.glbInstance.root);
+        }
+      }
+    }
   });
 
   let width = initialWidth;
@@ -208,6 +225,20 @@ export function createARSceneManager(
 
       renderer.setViewport(vpX, vpY, vpSize, vpSize);
       renderer.setScissor(scX, scY, scW, scH);
+
+      // Dynamically upgrade procedural fallback to Blender GLB once loaded over network
+      if (masterGLB && !instance.glbInstance) {
+        if (instance.rig) {
+          instance.subScene.remove(instance.rig.root);
+          instance.rig = undefined;
+        }
+        if (instance.platform) {
+          instance.subScene.remove(instance.platform);
+          instance.platform = undefined;
+        }
+        instance.glbInstance = instantiateGLBCharacter(masterGLB);
+        instance.subScene.add(instance.glbInstance.root);
+      }
 
       // Animate Blender GLB or Procedural character
       if (instance.glbInstance) {

@@ -22,11 +22,36 @@ export interface GLBCharacterInstance {
 let cachedGLB: LoadedGLBCharacter | null = null;
 let loadPromise: Promise<LoadedGLBCharacter | null> | null = null;
 
-export const CANDIDATE_GLB_PATHS = [
-  '/models/ch1.glb',
-  '/models/character.glb',
-  '/models/model.glb',
-];
+function getCandidatePaths(): string[] {
+  const base = typeof import.meta !== 'undefined' && import.meta.env?.BASE_URL ? import.meta.env.BASE_URL : '/';
+  const cleanBase = base.endsWith('/') ? base : `${base}/`;
+  return [
+    `${cleanBase}models/character.glb`,
+    `${cleanBase}models/ch1.glb`,
+    '/models/character.glb',
+    '/models/ch1.glb',
+  ];
+}
+
+export const CANDIDATE_GLB_PATHS = getCandidatePaths();
+
+/**
+ * Checks whether a URL is accessible and is not an HTML 404 rewrite fallback.
+ */
+async function isValidModelUrl(url: string): Promise<boolean> {
+  try {
+    const res = await fetch(url, { method: 'GET', headers: { Range: 'bytes=0-15' } });
+    if (!res.ok) return false;
+    const ct = (res.headers.get('content-type') || '').toLowerCase();
+    if (ct.includes('text/html')) {
+      // Vercel SPA rewrite fallback returning index.html for a missing asset
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 function tryLoadGLB(loader: GLTFLoader, url: string): Promise<LoadedGLBCharacter | null> {
   return new Promise((resolve) => {
@@ -50,7 +75,7 @@ function tryLoadGLB(loader: GLTFLoader, url: string): Promise<LoadedGLBCharacter
         const center = new THREE.Vector3();
         box.getCenter(center);
 
-        // Target height ~ 1.15 units (compact miniature toy proportion for physical tiles)
+        // Target height ~ 0.6 to 1.15 units
         const targetHeight = 0.6;
         const scale = size.y > 0 ? targetHeight / size.y : 1;
         root.scale.set(scale, scale, scale);
@@ -81,7 +106,8 @@ function tryLoadGLB(loader: GLTFLoader, url: string): Promise<LoadedGLBCharacter
         resolve(loaded);
       },
       undefined,
-      () => {
+      (err) => {
+        console.warn(`[GLB Loader] Could not parse '${url}':`, err);
         resolve(null);
       }
     );
@@ -90,8 +116,8 @@ function tryLoadGLB(loader: GLTFLoader, url: string): Promise<LoadedGLBCharacter
 
 /**
  * Loads and normalizes a Blender .glb export file.
- * Automatically checks candidate paths (e.g. /models/ch1.glb, /models/character.glb).
- * Centers the pivot at the character's feet (Y = 0) and normalizes height to ~1.55 units.
+ * Automatically checks candidate paths (e.g. /models/character.glb, /models/ch1.glb).
+ * Centers the pivot at the character's feet (Y = 0) and normalizes height.
  */
 export async function loadGLBCharacter(specificUrl?: string): Promise<LoadedGLBCharacter | null> {
   if (cachedGLB) return cachedGLB;
@@ -99,9 +125,12 @@ export async function loadGLBCharacter(specificUrl?: string): Promise<LoadedGLBC
 
   loadPromise = (async () => {
     const loader = new GLTFLoader();
-    const urlsToTry = specificUrl ? [specificUrl] : CANDIDATE_GLB_PATHS;
+    const urlsToTry = specificUrl ? [specificUrl] : getCandidatePaths();
 
     for (const url of urlsToTry) {
+      const isValid = await isValidModelUrl(url);
+      if (!isValid) continue;
+
       const result = await tryLoadGLB(loader, url);
       if (result) {
         cachedGLB = result;
