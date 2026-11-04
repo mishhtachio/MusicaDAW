@@ -36,7 +36,7 @@ export const FreejamHeader: React.FC<FreejamHeaderProps> = ({
       </button>
 
       {/* Center Title */}
-      <h1 className="freejam-title">Freejam</h1>
+      <h1 className="freejam-title">MusicaDAW</h1>
 
       {/* Right Settings Button (Circular Blue) */}
       <button
