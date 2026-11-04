@@ -13,6 +13,7 @@ import {
   findBoundaryStartPixel,
   type Point,
 } from './triangleDetector';
+import { analyzeCircleContour } from './circleDetector';
 
 export interface ITileDetector {
   detect(
@@ -110,30 +111,50 @@ export class DeterministicTileDetector implements ITileDetector {
     const minTileAreaPx = Math.max(16, expectedCellAreaPx * opts.minAreaRatio);
     const maxTileAreaPx = expectedCellAreaPx * opts.maxAreaRatio;
 
-    // 3. Estimate paper background luminance
-    let sumLum = 0;
-    let sampleCount = 0;
+    // 3. Estimate paper background luminance across a 3x3 spatial grid to absorb lighting gradients & shadows
+    const lumGridSum = new Float64Array(9);
+    const lumGridCount = new Uint32Array(9);
     const step = 4;
     for (let y = 0; y < height; y += step) {
       for (let x = 0; x < width; x += step) {
         const u = x / width;
         const v = y / height;
         const boardPt = imageToBoard(u, v, Hinv);
-        if (boardPt.x >= 0.1 && boardPt.x <= 0.9 && boardPt.y >= 0.1 && boardPt.y <= 0.9) {
+        if (boardPt.x >= 0.08 && boardPt.x <= 0.92 && boardPt.y >= 0.08 && boardPt.y <= 0.92) {
+          const gx = Math.min(2, Math.max(0, Math.floor(boardPt.x * 3)));
+          const gy = Math.min(2, Math.max(0, Math.floor(boardPt.y * 3)));
+          const gIdx = gy * 3 + gx;
+
           const idx = (y * width + x) * 4;
           const lum = 0.299 * data[idx] + 0.587 * data[idx + 1] + 0.114 * data[idx + 2];
-          sumLum += lum;
-          sampleCount++;
+          lumGridSum[gIdx] += lum;
+          lumGridCount[gIdx]++;
         }
       }
     }
-    const avgPaperLum = sampleCount > 0 ? sumLum / sampleCount : 210;
+
+    const lumGrid = new Float32Array(9);
+    let grandSum = 0;
+    let grandCount = 0;
+    for (let i = 0; i < 9; i++) {
+      if (lumGridCount[i] > 0) {
+        lumGrid[i] = lumGridSum[i] / lumGridCount[i];
+        grandSum += lumGridSum[i];
+        grandCount += lumGridCount[i];
+      } else {
+        lumGrid[i] = 210;
+      }
+    }
+    const avgPaperLum = grandCount > 0 ? grandSum / grandCount : 210;
+    for (let i = 0; i < 9; i++) {
+      if (lumGridCount[i] === 0) lumGrid[i] = avgPaperLum;
+    }
 
     // 4. Foreground Mask generation for pixels strictly inside the board
     // A tile pixel is defined as:
-    // a) Distinct color (saturation >= 0.22 and not pitch-black) - e.g. cyan, magenta, orange, blue, green, etc.
+    // a) Distinct color (saturation >= 0.20 and not pitch-black) - e.g. cyan, magenta, orange, blue, green, etc.
     // OR
-    // b) Moderate luminance contrast (noticeably darker than white paper, but not the thin black 1px ink line)
+    // b) Moderate luminance contrast (noticeably darker than local paper background)
     const mask = new Uint8Array(width * height);
 
     // Compute bounding box of board in image pixels to restrict scan
@@ -166,21 +187,24 @@ export class DeterministicTileDetector implements ITileDetector {
         const [h, s, v] = rgbToHsv(r, g, b);
         const lum = 0.299 * r + 0.587 * g + 0.114 * b;
 
+        // Local paper luminance based on spatial grid
+        const gx = Math.min(2, Math.max(0, Math.floor(boardPt.x * 3)));
+        const gy = Math.min(2, Math.max(0, Math.floor(boardPt.y * 3)));
+        const localPaperLum = lumGrid[gy * 3 + gx];
+
         // Foreground Token Classification:
         // Prioritizes red circle/triangle tokens and distinct colored/contrast tokens against paper:
         // 1. Red circle/triangle tokens: in RGB space, red is distinctly stronger than green and blue
         const isRedToken = (r - g > 16 && r - b > 16 && r > 50) ||
-          ((h <= 28 || h >= 332) && s >= 0.20 && v >= 0.22);
+          ((h <= 28 || h >= 332) && s >= 0.18 && v >= 0.20);
 
         // 2. Other colored tokens (yellow, green, orange, cyan, blue, magenta stickers/cutouts)
-        //    White paper has saturation < 0.16. Colored paper has distinct saturation (s >= 0.22)
-        //    and chromatic spread between max and min channel > 22.
         const maxCh = Math.max(r, g, b);
         const minCh = Math.min(r, g, b);
-        const isSaturatedToken = s >= 0.22 && v >= 0.22 && (maxCh - minCh) > 22;
+        const isSaturatedToken = s >= 0.20 && v >= 0.20 && (maxCh - minCh) > 20;
 
         // 3. High-contrast tokens distinctly darker than local paper background
-        const isContrastToken = lum < avgPaperLum - 38 && lum > 25;
+        const isContrastToken = lum < localPaperLum - 34 && lum > 25;
 
         if (isRedToken || isSaturatedToken || isContrastToken) {
           mask[y * width + x] = 1;
@@ -314,13 +338,23 @@ export class DeterministicTileDetector implements ITileDetector {
       let triFitRatio: number | undefined;
       let triVerticesImg: Point2D[] | undefined;
       let triCentroid: Point | undefined;
+      let circleCentroid: Point | undefined;
+      let circleConfidence: number | undefined;
 
       if (opts.targetShape === 'circle') {
-        // Circles: near-square bounding box, high circularity, solid fill ratio
-        // Strictly rejects triangles, squares, and rectangles:
-        // 1. Triangles have extent <= 0.60
-        // 2. Circles have extent ~0.785 (pi/4) and empty bounding box corners
-        // 3. Squares and rectangles have extent >= 0.90 and filled bounding box corners
+        const startX = blob.startPixelIndex % width;
+        const startY = Math.floor(blob.startPixelIndex / width);
+        const contour = traceContour(mask, width, height, startX, startY);
+
+        // 1. Perspective-Rectified Circle Fit in normalized board coordinates (1000x1000)
+        // Rectification completely eliminates slant/perspective ellipse distortion from tilted cameras!
+        const rectifiedContour = contour.map((pt) => {
+          const bp = imageToBoard(pt.x / width, pt.y / height, Hinv);
+          return { x: bp.x * 1000, y: bp.y * 1000 };
+        });
+        const rectCircle = analyzeCircleContour(rectifiedContour);
+        const imgCircle = analyzeCircleContour(contour);
+
         const radius = (blobW + blobH) / 4;
         const expectedCircleArea = Math.PI * radius * radius;
         const fillRatio = blob.pixels / expectedCircleArea;
@@ -343,18 +377,26 @@ export class DeterministicTileDetector implements ITileDetector {
         }
         const cornerFillRatio = cornerFilledPixels / Math.max(1, totalCornerSamples);
 
-        const passesCircle =
-          aspectRatio >= 0.65 &&
-          aspectRatio <= 1.55 &&
+        // Coarse geometrical criteria
+        const passesCoarse =
+          aspectRatio >= 0.60 &&
+          aspectRatio <= 1.65 &&
           circularity >= 0.35 &&
           fillRatio >= 0.40 &&
           fillRatio <= 1.25 &&
-          extent >= 0.62 &&
+          extent >= 0.58 &&
           extent <= 0.88 &&
           cornerFillRatio <= 0.35;
 
-        if (passesCircle) {
+        // Precision algebraic circle criteria (rectified or image-space)
+        const passesAlgebraic = rectCircle.isCircle || imgCircle.isCircle;
+
+        if (passesCoarse || passesAlgebraic) {
           isCandidateAccepted = true;
+          circleConfidence = Math.max(rectCircle.confidence, imgCircle.confidence, circularity);
+          if (imgCircle.isCircle && imgCircle.centroid) {
+            circleCentroid = imgCircle.centroid;
+          }
         }
       } else if (opts.targetShape === 'triangle') {
         // Triangles: extract outer boundary contour & run comprehensive geometric analysis
@@ -395,11 +437,15 @@ export class DeterministicTileDetector implements ITileDetector {
 
       // Calculate centroid: blend geometric vertex centroid with pixel center of mass for triangles
       const cx =
-        triCentroid && opts.targetShape === 'triangle'
+        circleCentroid && opts.targetShape === 'circle'
+          ? circleCentroid.x
+          : triCentroid && opts.targetShape === 'triangle'
           ? triCentroid.x * 0.7 + (blob.sumX / blob.pixels) * 0.3
           : blob.sumX / blob.pixels;
       const cy =
-        triCentroid && opts.targetShape === 'triangle'
+        circleCentroid && opts.targetShape === 'circle'
+          ? circleCentroid.y
+          : triCentroid && opts.targetShape === 'triangle'
           ? triCentroid.y * 0.7 + (blob.sumY / blob.pixels) * 0.3
           : blob.sumY / blob.pixels;
 
@@ -446,10 +492,11 @@ export class DeterministicTileDetector implements ITileDetector {
 
       let confidence: number;
       if (opts.targetShape === 'circle') {
-        // In circle mode: 50% circularity/shape + 30% center alignment + 20% area match
+        // In circle mode: 50% circularity/Kasa fit confidence + 30% center alignment + 20% area match
+        const circleScore = circleConfidence !== undefined ? circleConfidence : shapeScore;
         confidence = Math.min(
           1.0,
-          0.50 * shapeScore + 0.30 * centerAlignment + 0.20 * areaScore
+          0.50 * circleScore + 0.30 * centerAlignment + 0.20 * areaScore
         );
       } else if (opts.targetShape === 'triangle') {
         // In triangle mode: 50% triangle geometric confidence + 30% center alignment + 20% area match
