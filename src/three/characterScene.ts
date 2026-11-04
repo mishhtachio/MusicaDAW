@@ -5,6 +5,11 @@ import {
   resetCharacterPose,
   type CharacterRig,
 } from './proceduralCharacter';
+import {
+  loadGLBCharacter,
+  instantiateGLBCharacter,
+  type GLBCharacterInstance,
+} from './glbCharacterLoader';
 
 export interface SceneController {
   canvas: HTMLCanvasElement;
@@ -62,10 +67,19 @@ export function initProceduralCharacterScene(container: HTMLElement): SceneContr
   fillLight.position.set(-3, 3, -2);
   scene.add(fillLight);
 
-  // 5. Build procedural character & platform
+  // 5. Build procedural character & platform (with automatic Blender .glb enhancement)
   const { rig, platform } = createProceduralCharacter();
   scene.add(platform);
   scene.add(rig.root);
+
+  let glbInstance: GLBCharacterInstance | null = null;
+  loadGLBCharacter().then((loaded) => {
+    if (loaded) {
+      glbInstance = instantiateGLBCharacter(loaded);
+      rig.root.visible = false;
+      scene.add(glbInstance.root);
+    }
+  });
 
   // 6. Interactive Orbit / Drag controls (without external OrbitControls library)
   let isDragging = false;
@@ -132,7 +146,11 @@ export function initProceduralCharacterScene(container: HTMLElement): SceneContr
 
     if (isPlaying) {
       accumulatedTime += delta;
-      updateCharacterIdle(rig, accumulatedTime);
+      if (glbInstance) {
+        glbInstance.update(delta);
+      } else {
+        updateCharacterIdle(rig, accumulatedTime);
+      }
     }
 
     renderer.render(scene, camera);

@@ -4,11 +4,18 @@ import {
   updateCharacterIdle,
   type CharacterRig,
 } from './proceduralCharacter';
+import {
+  loadGLBCharacter,
+  instantiateGLBCharacter,
+  type LoadedGLBCharacter,
+  type GLBCharacterInstance,
+} from './glbCharacterLoader';
 
 export interface ARCharacterInstance {
   key: string;
-  rig: CharacterRig;
-  platform: THREE.Group;
+  rig?: CharacterRig;
+  glbInstance?: GLBCharacterInstance;
+  platform?: THREE.Group;
   subScene: THREE.Scene;
   currentPos: { x: number; y: number };
   targetPos: { x: number; y: number };
@@ -76,6 +83,11 @@ export function createARSceneManager(
   const characters = new Map<string, ARCharacterInstance>();
   const clock = new THREE.Clock();
 
+  let masterGLB: LoadedGLBCharacter | null = null;
+  loadGLBCharacter().then((loaded) => {
+    masterGLB = loaded;
+  });
+
   let width = initialWidth;
   let height = initialHeight;
 
@@ -95,14 +107,25 @@ export function createARSceneManager(
     fillLight.position.set(-3, 3, -2);
     subScene.add(fillLight);
 
-    // Omit bulky dark platform so the character and contact shadow stand cleanly on the physical tile
-    const { rig, platform } = createProceduralCharacter({ includePlatform: false });
-    subScene.add(platform);
-    subScene.add(rig.root);
+    let rig: CharacterRig | undefined;
+    let glbInstance: GLBCharacterInstance | undefined;
+    let platform: THREE.Group | undefined;
+
+    if (masterGLB) {
+      glbInstance = instantiateGLBCharacter(masterGLB);
+      subScene.add(glbInstance.root);
+    } else {
+      const proc = createProceduralCharacter({ includePlatform: false });
+      rig = proc.rig;
+      platform = proc.platform;
+      subScene.add(platform);
+      subScene.add(rig.root);
+    }
 
     return {
       key,
       rig,
+      glbInstance,
       platform,
       subScene,
       currentPos: { x: initialPos.x, y: initialPos.y },
@@ -120,6 +143,7 @@ export function createARSceneManager(
   }
 
   function render(activePositions: Map<string, { x: number; y: number; radiusPx: number }>) {
+    const delta = clock.getDelta();
     const elapsed = clock.getElapsedTime();
     const activeKeys = new Set(activePositions.keys());
 
@@ -185,8 +209,12 @@ export function createARSceneManager(
       renderer.setViewport(vpX, vpY, vpSize, vpSize);
       renderer.setScissor(scX, scY, scW, scH);
 
-      // Animate life-like idle breathing and limb motions
-      updateCharacterIdle(instance.rig, elapsed);
+      // Animate Blender GLB or Procedural character
+      if (instance.glbInstance) {
+        instance.glbInstance.update(delta);
+      } else if (instance.rig) {
+        updateCharacterIdle(instance.rig, elapsed);
+      }
 
       // Render through perspective camera
       renderer.render(instance.subScene, camera);

@@ -75,7 +75,7 @@ export function App() {
 
   // Configurable board dimensions and pitches
   const [pitches] = useState<PitchName[]>(INITIAL_BOARD_CONFIG.pitches);
-  const [cols] = useState<number>(INITIAL_BOARD_CONFIG.cols);
+  const [cols, setCols] = useState<number>(INITIAL_BOARD_CONFIG.cols);
 
   // Calibrated board corners (preserved between screen switches)
   const [calibratedCorners, setCalibratedCorners] = useState<BoardCorners>(DEFAULT_BOARD_CORNERS);
@@ -291,6 +291,8 @@ export function App() {
           onClose={() => setIsSettingsOpen(false)}
           bpm={bpm}
           onBpmChange={setBpm}
+          cols={cols}
+          onColsChange={setCols}
           savedTracks={savedTracks}
           activeSavedTrackIds={activeSavedTrackIds}
           onToggleActiveTrack={handleToggleActiveTrack}

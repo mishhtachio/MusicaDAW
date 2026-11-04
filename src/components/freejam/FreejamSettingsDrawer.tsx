@@ -6,6 +6,8 @@ interface FreejamSettingsDrawerProps {
   onClose: () => void;
   bpm: number;
   onBpmChange: (newBpm: number) => void;
+  cols: number;
+  onColsChange: (cols: number) => void;
   savedTracks: SavedTrack[];
   activeSavedTrackIds: Set<string>;
   onToggleActiveTrack: (trackId: string) => void;
@@ -20,6 +22,8 @@ export const FreejamSettingsDrawer: React.FC<FreejamSettingsDrawerProps> = ({
   onClose,
   bpm,
   onBpmChange,
+  cols,
+  onColsChange,
   savedTracks,
   activeSavedTrackIds,
   onToggleActiveTrack,
@@ -73,6 +77,29 @@ export const FreejamSettingsDrawer: React.FC<FreejamSettingsDrawerProps> = ({
               >
                 ＋
               </button>
+            </div>
+          </section>
+
+          {/* Grid Columns (Bars / Steps) */}
+          <section className="modal-section">
+            <div className="section-label-row">
+              <span className="section-title">Grid Columns (Bars / Steps)</span>
+              <span className="section-value-badge">{cols} Columns (5×{cols})</span>
+            </div>
+            <p className="section-hint">
+              Supports 4 bars, 8 bars, or extended layouts with automatic physical detection and AR scaling.
+            </p>
+            <div className="grid-step-selector-row">
+              {[4, 8, 12, 16].map((num) => (
+                <button
+                  key={`cols-preset-${num}`}
+                  type="button"
+                  className={`grid-preset-btn ${cols === num ? 'active' : ''}`}
+                  onClick={() => onColsChange(num)}
+                >
+                  {num} Bars
+                </button>
+              ))}
             </div>
           </section>
 
