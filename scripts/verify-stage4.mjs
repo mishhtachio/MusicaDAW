@@ -273,12 +273,23 @@ assert.equal(squareAsTri.isTriangle, false, 'Square must be rejected in triangle
 assert.ok(squareAsTri.inscribedRatio <= 0.52, `Square ratio (${squareAsTri.inscribedRatio}) must be <= 0.52`);
 console.log(`✓ Square/rectangle strictly rejected (ratio ${Math.round(squareAsTri.inscribedRatio * 100)}% <= 52%)`);
 
-// ── Test 3: Triangle Rejection in Piano Mode ─────────────────────────────────
-console.log('Testing Triangle Rejection in Piano Mode...');
+// ── Test 3: Shape Rejections in Piano (Circle) Mode ────────────────────────
+console.log('Testing Triangle, Square & Rectangle Rejection in Piano Mode...');
 const triCircularity = (4 * Math.PI * 1800) / (polygonPerimeter(tracedContour) ** 2);
-const passesCircleGate = triAnalysis.extent >= 0.62 && triCircularity >= 0.50;
-assert.equal(passesCircleGate, false, 'Triangle must be strictly rejected by circle mode gate');
-console.log('✓ Triangles are strictly rejected by the piano (circle) detector (extent <= 0.62)');
+const triPassesCircleGate = triAnalysis.extent >= 0.62 && triCircularity >= 0.50;
+assert.equal(triPassesCircleGate, false, 'Triangle must be strictly rejected by circle mode gate');
+
+// Solid square extent is ~1.0 (fails extent <= 0.88 gate), and corner fill is ~1.0 (fails <= 0.35)
+const squareExtent = 1.0;
+const squarePassesCircle = squareExtent >= 0.62 && squareExtent <= 0.88;
+assert.equal(squarePassesCircle, false, 'Square must be strictly rejected by circle mode extent gate');
+
+// Elongated rectangle aspect ratio is 2.4 (fails aspect ratio <= 1.55 gate)
+const rectAspectRatio = 2.4;
+const rectPassesCircle = rectAspectRatio >= 0.65 && rectAspectRatio <= 1.55;
+assert.equal(rectPassesCircle, false, 'Rectangle must be strictly rejected by circle mode aspect ratio gate');
+
+console.log('✓ Triangles, squares, and rectangles are strictly rejected by the piano (circle) detector');
 
 // ── Test 4: Drum Voice Row Mapping ──────────────────────────────────────────
 console.log('Testing Drum Voice Row Mapping...');

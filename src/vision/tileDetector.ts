@@ -316,18 +316,42 @@ export class DeterministicTileDetector implements ITileDetector {
       let triCentroid: Point | undefined;
 
       if (opts.targetShape === 'circle') {
-        // Circles: near-square bounding box, high circularity, solid fill ratio, reject triangles
+        // Circles: near-square bounding box, high circularity, solid fill ratio
+        // Strictly rejects triangles, squares, and rectangles:
+        // 1. Triangles have extent <= 0.60
+        // 2. Circles have extent ~0.785 (pi/4) and empty bounding box corners
+        // 3. Squares and rectangles have extent >= 0.90 and filled bounding box corners
         const radius = (blobW + blobH) / 4;
         const expectedCircleArea = Math.PI * radius * radius;
         const fillRatio = blob.pixels / expectedCircleArea;
 
-        // Triangles have extent <= 0.60; circles have extent >= 0.65
+        // Sample the 4 outer corners of the bounding box
+        // For a true circle, the bounding box corners are outside the radius and empty.
+        // For a square/rectangle, the corners are solid.
+        const cornerSampleW = Math.max(1, Math.floor(blobW * 0.15));
+        const cornerSampleH = Math.max(1, Math.floor(blobH * 0.15));
+        let cornerFilledPixels = 0;
+        const totalCornerSamples = cornerSampleW * cornerSampleH * 4;
+
+        for (let dy = 0; dy < cornerSampleH; dy++) {
+          for (let dx = 0; dx < cornerSampleW; dx++) {
+            if (mask[(blob.minY + dy) * width + (blob.minX + dx)]) cornerFilledPixels++;
+            if (mask[(blob.minY + dy) * width + (blob.maxX - dx)]) cornerFilledPixels++;
+            if (mask[(blob.maxY - dy) * width + (blob.minX + dx)]) cornerFilledPixels++;
+            if (mask[(blob.maxY - dy) * width + (blob.maxX - dx)]) cornerFilledPixels++;
+          }
+        }
+        const cornerFillRatio = cornerFilledPixels / Math.max(1, totalCornerSamples);
+
         const passesCircle =
-          aspectRatio >= 0.60 &&
-          aspectRatio <= 1.65 &&
+          aspectRatio >= 0.65 &&
+          aspectRatio <= 1.55 &&
           circularity >= 0.35 &&
           fillRatio >= 0.40 &&
-          extent >= 0.62;
+          fillRatio <= 1.25 &&
+          extent >= 0.62 &&
+          extent <= 0.88 &&
+          cornerFillRatio <= 0.35;
 
         if (passesCircle) {
           isCandidateAccepted = true;

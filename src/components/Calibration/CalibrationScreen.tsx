@@ -571,7 +571,7 @@ export const CalibrationScreen: React.FC<CalibrationScreenProps> = ({
           <h4 className="guide-title">Stage 3 Tangible Tile Music Guide:</h4>
           <ol className="guide-steps">
             <li>
-              <strong>Physical Note Tiles</strong>: Place rectangular tiles (e.g. colored foam, cardstock, or cyan rectangles) inside the 5×4 grid.
+              <strong>Physical Note Tiles</strong>: Place circular tiles (e.g. bottle caps, round foam discs) for Piano notes, or triangular tiles for Drums.
             </li>
             <li>
               <strong>Musical Mapping</strong>: Each row determines pitch (`C6`, `A5`, `G5`, `E5`, `D5`) and each column determines time step (`1`, `2`, `3`, `4`).
